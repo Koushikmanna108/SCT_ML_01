@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Housing Price Prediction</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #111827;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --accent: #22d3ee;
+      --accent-dark: #0ea5e9;
+      --success: #10b981;
+      --card-gradient: linear-gradient(145deg, rgba(17,24,39,0.9) 0%, rgba(31,41,55,0.7) 100%);
+      --glow: 0 0 15px rgba(34, 211, 238, 0.3);
+    }
+    
+    * { 
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body { 
+      margin: 0; 
+      font-family: 'Segoe UI', system-ui, -apple-system, Roboto, Ubuntu, sans-serif; 
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%); 
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    
+    .container { 
+      width: 100%;
+      max-width: 900px;
+      margin: 20px auto;
+      animation: fadeIn 0.8s ease-out;
+    }
+    
+    .card { 
+      background: var(--card-gradient); 
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.08); 
+      border-radius: 20px; 
+      padding: 32px; 
+      box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(34,211,238,0.1) 0%, transparent 70%);
+      transform: rotate(0deg);
+      pointer-events: none;
+    }
+    
+    .header {
+      margin-bottom: 28px;
+      position: relative;
+    }
+    
+    h1 { 
+      margin: 0 0 12px; 
+      font-size: 32px; 
+      letter-spacing: 0.5px; 
+      font-weight: 700;
+      background: linear-gradient(to right, var(--text) 0%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      position: relative;
+      display: inline-block;
+    }
+    
+    h1::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      width: 50px;
+      height: 3px;
+      background: var(--accent);
+      border-radius: 3px;
+    }
+    
+    p.desc { 
+      margin: 0 0 28px; 
+      color: var(--muted);
+      font-size: 16px;
+      max-width: 600px;
+    }
+    
+    form { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); 
+      gap: 22px; 
+    }
+    
+    .field { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 10px;
+      position: relative;
+    }
+    
+    label { 
+      font-size: 15px; 
+      color: var(--text);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    label i {
+      color: var(--accent);
+      font-size: 14px;
+    }
+    
+    input[type="number"], 
+    select { 
+      width: 100%; 
+      padding: 14px 16px; 
+      border-radius: 12px; 
+      border: 1px solid rgba(255,255,255,0.12); 
+      background: rgba(31,41,55,0.5); 
+      color: var(--text); 
+      outline: none;
+      font-size: 15px;
+      transition: all 0.3s ease;
+    }
+    
+    input[type="number"]:hover, 
+    select:hover {
+      border-color: rgba(34,211,238,0.3);
+    }
+    
+    input[type="number"]:focus, 
+    select:focus { 
+      border-color: var(--accent); 
+      box-shadow: var(--glow);
+      transform: translateY(-2px);
+    }
+    
+    .radio-group { 
+      display: flex; 
+      align-items: center; 
+      gap: 16px; 
+      flex-wrap: wrap; 
+      padding: 14px 16px; 
+      border: 1px solid rgba(255,255,255,0.12); 
+      border-radius: 12px; 
+      background: rgba(31,41,55,0.5);
+      transition: all 0.3s ease;
+    }
+    
+    .radio-group:focus-within {
+      border-color: var(--accent);
+      box-shadow: var(--glow);
+    }
+    
+    .radio-group label { 
+      display:flex; 
+      align-items:center; 
+      gap:8px; 
+      font-size:15px; 
+      color: var(--text);
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    
+    .radio-group label:hover {
+      color: var(--accent);
+    }
+    
+    input[type="radio"] {
+      accent-color: var(--accent);
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+    
+    .actions { 
+      grid-column: 1 / -1; 
+      display: flex; 
+      gap: 16px; 
+      justify-content: flex-end; 
+      margin-top: 16px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    
+    button { 
+      padding: 14px 24px; 
+      border: none; 
+      border-radius: 12px; 
+      cursor: pointer; 
+      font-weight: 600;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary { 
+      background: linear-gradient(to right, var(--accent) 0%, var(--accent-dark) 100%);
+      color: #0b1020; 
+      box-shadow: 0 4px 10px rgba(34, 211, 238, 0.25);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 15px rgba(34, 211, 238, 0.4);
+    }
+    
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+    
+    .btn-secondary { 
+      background: transparent; 
+      color: var(--text); 
+      border: 1px solid rgba(255,255,255,0.18);
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.05);
+      border-color: rgba(255,255,255,0.25);
+    }
+    
+    small.hint { 
+      color: var(--muted); 
+      font-size: 12.5px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .result-container {
+      margin-top: 28px;
+      padding: 20px;
+      border-radius: 12px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      animation: fadeIn 0.5s ease-out;
+    }
+    
+    .result-container p {
+      color: var(--text);
+      font-size: 17px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .result-container p:before {
+      content: '💰';
+      font-size: 24px;
+    }
+    
+    .price {
+      font-weight: 700;
+      color: var(--success);
+      font-size: 20px;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        padding: 10px;
+      }
+      
+      .card {
+        padding: 24px;
+      }
+      
+      form {
+        grid-template-columns: 1fr;
+      }
+      
+      h1 {
+        font-size: 28px;
+      }
+      
+      .actions {
+        flex-direction: column;
+      }
+      
+      button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="header">
+        <h1>Housing Price Predictor</h1>
+        <p class="desc">Fill in the property details below to get an accurate price prediction. Fields marked with * are required.</p>
+      </div>
+
+      <form action="{{ url_for('predict_datapoint') }}" method="post" autocomplete="on">
+        <div class="field">
+          <label for="area"><i class="fas fa-ruler-combined"></i> Area (sq ft) *</label>
+          <input type="number" id="area" name="area" inputmode="numeric" min="0" step="1" placeholder="e.g., 3500" required />
+          <small class="hint"><i class="fas fa-info-circle"></i> Integer only</small>
+        </div>
+
+        <div class="field">
+          <label for="bedrooms"><i class="fas fa-bed"></i> Bedrooms *</label>
+          <input type="number" id="bedrooms" name="bedrooms" inputmode="numeric" min="0" step="1" placeholder="e.g., 3" required />
+          <small class="hint"><i class="fas fa-info-circle"></i> Integer only</small>
+        </div>
+
+        <div class="field">
+          <label for="bathrooms"><i class="fas fa-bath"></i> Bathrooms *</label>
+          <input type="number" id="bathrooms" name="bathrooms" inputmode="numeric" min="0" step="1" placeholder="e.g., 2" required />
+          <small class="hint"><i class="fas fa-info-circle"></i> Integer only</small>
+        </div>
+
+        <div class="field">
+          <label for="stories"><i class="fas fa-layer-group"></i> Stories *</label>
+          <input type="number" id="stories" name="stories" inputmode="numeric" min="0" step="1" placeholder="e.g., 2" required />
+          <small class="hint"><i class="fas fa-info-circle"></i> Integer only</small>
+        </div>
+
+        <div class="field">
+          <label for="mainroad"><i class="fas fa-road"></i> Main Road Access *</label>
+          <select id="mainroad" name="mainroad" required>
+            <option value="" disabled selected>Select an option</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="guestroom"><i class="fas fa-door-open"></i> Guest Room *</label>
+          <select id="guestroom" name="guestroom" required>
+            <option value="" disabled selected>Select an option</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="basement"><i class="fas fa-house-flood-water"></i> Basement *</label>
+          <select id="basement" name="basement" required>
+            <option value="" disabled selected>Select an option</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="hotwaterheating"><i class="fas fa-fire"></i> Hot Water Heating *</label>
+          <select id="hotwaterheating" name="hotwaterheating" required>
+            <option value="" disabled selected>Select an option</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="airconditioning"><i class="fas fa-fan"></i> Air Conditioning *</label>
+          <select id="airconditioning" name="airconditioning" required>
+            <option value="" disabled selected>Select an option</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="parking"><i class="fas fa-car"></i> Parking (spaces) *</label>
+          <input type="number" id="parking" name="parking" inputmode="numeric" min="0" step="1" placeholder="e.g., 1" required />
+          <small class="hint"><i class="fas fa-info-circle"></i> Integer only</small>
+        </div>
+
+        <div class="field">
+          <label for="prefarea"><i class="fas fa-map-marker-alt"></i> Preferred Area *</label>
+          <select id="prefarea" name="prefarea" required>
+            <option value="" disabled selected>Select an option</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+          </select>
+        </div>
+
+        <div class="field" style="grid-column: 1 / -1;">
+          <label><i class="fas fa-couch"></i> Furnishing Status *</label>
+          <div class="radio-group" role="radiogroup" aria-label="Furnishing Status">
+            <label><input type="radio" name="furnishingstatus" value="furnished" required /> Furnished</label>
+            <label><input type="radio" name="furnishingstatus" value="semi-furnished" /> Semi-Furnished</label>
+            <label><input type="radio" name="furnishingstatus" value="unfurnished" /> Unfurnished</label>
+          </div>
+          <small class="hint"><i class="fas fa-info-circle"></i> Pick exactly one</small>
+        </div>
+
+        <div class="actions">
+          <button type="reset" class="btn-secondary"><i class="fas fa-undo"></i> Reset</button>
+          <button type="submit" class="btn-primary"><i class="fas fa-calculator"></i> Calculate Price</button>
+        </div>
+      </form>
+
+      <div class="result-container">
+        <p>The estimated price of the house is: <span class="price">{{results}}</span></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Add subtle animations and interactions
+    document.addEventListener('DOMContentLoaded', function() {
+      const inputs = document.querySelectorAll('input, select');
+      
+      inputs.forEach(input => {
+        // Add focus class to parent for better styling
+        input.addEventListener('focus', function() {
+          this.parentElement.classList.add('focused');
+        });
+        
+        input.addEventListener('blur', function() {
+          this.parentElement.classList.remove('focused');
+        });
+      });
+      
+      // Add animation to result if present
+      const result = document.querySelector('.result-container');
+      if (result && result.textContent.includes('{{results}}') && !result.textContent.includes('{{results}}').trim()) {
+        result.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>
